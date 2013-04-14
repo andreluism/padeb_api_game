@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    
+    <h:head>
+        <title>Teste - Filtro</title>
+        #{filtroController.inicializa()}
+        
+    </h:head>
+    <h:body>
+        <h:form id="filtroUm">
+        <h:panelGrid id="panelGrid1" columns="3" style="margin-bottom:10px" cellpadding="5"  
+                bgcolor=""   columnClasses="label, column">   
+
+            <p:pickList id="pickListRegiao" value="#{filtroController.regioes}" var="regiao"   
+                         itemLabel="#{regiao.nome}" itemValue="#{regiao}" converter="#{regiaoConverter}" >
+                
+                <f:facet name="sourceCaption">Disponível</f:facet>  
+                <f:facet name="targetCaption">Escolhido</f:facet>
+                
+                <p:ajax event="transfer" listener="#{filtroController.handleSelectionRegiao}" update="pickListUF pickListRegiao pickListMunicipio @(.ui-datatable)" />
+            
+            </p:pickList>
+            
+            <p:pickList id="pickListUF" value="#{filtroController.UFs}" var="uf"   
+                        itemLabel="#{uf.nome}" itemValue="#{uf}" converter="#{UFConverter}">
+            
+                <f:facet name="sourceCaption">Disponível</f:facet>  
+                <f:facet name="targetCaption">Escolhido</f:facet>
+                
+                <p:ajax event="transfer" listener="#{filtroController.handleSelectionUF}" update="pickListUF pickListRegiao pickListMunicipio @(.ui-datatable)"/>
+            
+            </p:pickList>
+            
+            <p:pickList id="pickListMunicipio" value="#{filtroController.municipios}" var="mun"   
+                        itemLabel="#{mun.nome}" itemValue="#{mun}" converter="#{municipioConverter}"
+                        showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
+            
+                <f:facet name="sourceCaption">Disponível</f:facet>  
+                <f:facet name="targetCaption">Escolhido</f:facet>
+                
+                <p:ajax event="transfer" listener="#{filtroController.handleSelectionMunicipio}" update="pickListUF pickListRegiao pickListMunicipio @(.ui-datatable)"/>
+
+            </p:pickList>
+            
+        </h:panelGrid>
+            
+    </h:form>        
+    <h:form id="filtroDois">
+        
+        <h:panelGrid id="panelGrid2" columns="4" style="margin-bottom:10px" cellpadding="5"  
+                     bgcolor="" title="Filtros obrigatórios"  columnClasses="label, column">
+        
+        <p:selectOneListbox  label="Serie" id="listboxSerie" valueChangeListener="#{filtroController.handleSerie}"
+                             value="#{filtroController.serie}" >  
+            <f:selectItem itemLabel="5ª" itemValue="5" />  
+            <f:selectItem itemLabel="9ª" itemValue="9" />  
+            <f:selectItem itemLabel="3º" itemValue="12" />
+            
+            <p:ajax event="change" listener="#{filtroController.handleSerie}" />
+        </p:selectOneListbox>
+        
+        <p:selectOneListbox  label="Tipo de rede" id="listboxTipoRede" valueChangeListener="#{filtroController.handleTipoRede}"
+                             value="#{filtroController.tipoRede}">  
+            <f:selectItem itemLabel="-" itemValue="0" /> 
+            <f:selectItem itemLabel="Federal" itemValue="1" /> 
+            <f:selectItem itemLabel="Estadual" itemValue="2" />
+            <f:selectItem itemLabel="Municipal" itemValue="3" />
+            <f:selectItem itemLabel="Privada" itemValue="4" />
+            <f:selectItem itemLabel="Pública" itemValue="5" />
+            
+            <p:ajax event="change" listener="#{filtroController.handleTipoRede}" />
+        </p:selectOneListbox>
+        
+        <p:selectOneListbox  label="Localizacao" id="listboxLocalizacao" valueChangeListener="#{filtroController.handleLocalizacao}"
+                             value="#{filtroController.localizacao}"> 
+            <f:selectItem itemLabel="-" itemValue="0" /> 
+            <f:selectItem itemLabel="Urbana" itemValue="1" /> 
+            <f:selectItem itemLabel="Rural" itemValue="2" />
+            
+            <p:ajax event="change" listener="#{filtroController.handleCapital}" />
+        </p:selectOneListbox>
+            
+            
+        <p:selectOneListbox  label="Capital" id="listboxCapital" valueChangeListener="#{filtroController.handleCapital}"
+                         value="#{filtroController.capital}">  
+            <f:selectItem itemLabel="-" itemValue="0" /> 
+            <f:selectItem itemLabel="Capital" itemValue="1" /> 
+            <f:selectItem itemLabel="Interior" itemValue="2" />
+            
+            <p:ajax event="change" listener="#{filtroController.handleLocalizacao}" />
+        </p:selectOneListbox>
+            </h:panelGrid>
+        </h:form>
+        <h:form id="form" >
+        <h:panelGrid id="panelGrid3" columns="3" style="margin-bottom:10px" cellpadding="5"  
+                bgcolor=""   columnClasses="label, column">
+            <p:dataTable paginatorPosition="bottom" paginatorAlwaysVisible="false" id="dataTableRegiao" var="regiao" value="#{filtroController.regioes.target}" widgetVar="reigoesTable" rowKey="#{regiao}"   
+                         emptyMessage="Nenhuma região selecionada" paginator="true" rows="5" selection="#{filtroController.regioesDatatable}">
+                
+                <p:ajax event="rowSelect" listener="#{tableBean.onRowSelect}" update=":form" />
+                
+                <p:column selectionMode="multiple" style="width:20%" />
+  
+                <p:column id="modelColumn" filterBy="#{regiao.nome}" style="width:80%"
+                          headerText="Regiões" filterMatchMode="contains">  
+                    <h:outputText value="#{regiao.nome}" />  
+                </p:column>  
+            </p:dataTable>
+            
+            
+            <p:dataTable paginatorPosition="bottom" paginatorAlwaysVisible="false" id="dataTableUF" var="uf" value="#{filtroController.UFs.target}" widgetVar="ufsTable" rowKey="#{uf}"   
+                         emptyMessage="Nenhum estado selecionado" paginator="true" rows="5" selection="#{filtroController.UFsDatatable}">
+                
+                <p:column selectionMode="multiple" style="width:20%" />
+  
+                <p:column id="modelColumn" filterBy="#{uf.nome}" style="width:80%"
+                          headerText="Estados" filterMatchMode="contains">  
+                    <h:outputText value="#{uf.nome}" />  
+                </p:column>  
+            </p:dataTable>
+            
+            <p:dataTable paginatorPosition="bottom" paginatorAlwaysVisible="false" id="dataTableMunicipio" var="municipio" value="#{filtroController.municipios.target}" widgetVar="municipiosTable" rowKey="#{municipio}"   
+                         emptyMessage="Nenhum Município selecionad" paginator="true" rows="5" selection="#{filtroController.municipiosDatatable}">
+                
+                <p:column selectionMode="multiple" style="width:20%" />
+  
+                <p:column id="modelColumn" filterBy="#{municipio.nome}" style="width:80%"
+                          headerText="Municipios" filterMatchMode="contains">  
+                    <h:outputText value="#{municipio.nome}" />  
+                </p:column>  
+            </p:dataTable>
+            
+            
+            
+        </h:panelGrid>
+        
+        <p:commandButton value="Gerar gráfico" action="#{filtroController.prepareForChart()}" update="@(form)" ajax="true" oncomplete="dlgChart.show()"/>
+        
+        
+        <p:separator></p:separator>
+        
+        <p:dialog id="dialogChart" header="Grafico" widgetVar="dlgChart" closeOnEscape="true" dynamic="true" width="1000" modal="true">  
+
+
+                        <p:barChart id="regioesChart"  value="#{filtroController.categoryModel}" legendPosition="ne" style="height: available; width: available;"  
+                                    title="Comparativo de região" orientation="horizontal" min="0" max="400" shadow="false"
+                                    showDatatip="true"/>
+                </p:dialog> 
+          
+        
+        </h:form>
+    </h:body>
+</html>
